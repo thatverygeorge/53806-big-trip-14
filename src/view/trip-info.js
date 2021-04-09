@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {formatDate} from '../util.js';
+import {formatDate, createCustomElement} from '../util.js';
 
 const getTripStartAndEndDates = (events) => {
   let startDate = events[0].startDate;
@@ -43,3 +43,26 @@ export const createTripInfoTemplate = (events) => {
             </div>
           </section>`;
 };
+
+export default class TripInfo {
+  constructor(events) {
+    this._element = null;
+    this._events = events;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._events);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createCustomElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
