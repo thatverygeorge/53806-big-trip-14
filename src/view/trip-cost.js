@@ -1,3 +1,5 @@
+import {createCustomElement} from '../util.js';
+
 const getTripEventsCost = (events) => {
   return events.reduce((accumulator, currentEvent) => {
     return accumulator + currentEvent.price;
@@ -19,3 +21,26 @@ export const createTripCostTemplate = (events) => {
             Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalTripCost}</span>
           </p>`;
 };
+
+export default class TripCost {
+  constructor(events) {
+    this._element = null;
+    this._events = events;
+  }
+
+  getTemplate() {
+    return createTripCostTemplate(this._events);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createCustomElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

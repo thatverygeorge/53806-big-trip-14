@@ -1,4 +1,4 @@
-import {formatDate, formatDuration} from '../util.js';
+import {formatDate, getDuration, createCustomElement} from '../util.js';
 
 const createOfferTemplate = (offers) => {
   return offers.map((offer) => {
@@ -16,7 +16,6 @@ export const createEventTemplate = (event) => {
     price,
     startDate,
     endDate,
-    duration,
     destination,
     offers,
     isFavorite,
@@ -35,7 +34,7 @@ export const createEventTemplate = (event) => {
                   &mdash;
                   <time class="event__end-time" datetime="${formatDate(endDate, 'YYYY-MM-DDTHH:mm')}">${formatDate(endDate, 'HH:mm')}</time>
                 </p>
-                <p class="event__duration">${formatDuration(duration)}</p>
+                <p class="event__duration">${getDuration(startDate, endDate)}</p>
               </div>
               <p class="event__price">
                 &euro;&nbsp;<span class="event__price-value">${price}</span>
@@ -56,3 +55,26 @@ export const createEventTemplate = (event) => {
             </div>
           </li>`;
 };
+
+export default class Event {
+  constructor(event) {
+    this._element = null;
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createEventTemplate(this._event);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createCustomElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

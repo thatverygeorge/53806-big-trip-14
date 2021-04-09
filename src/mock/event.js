@@ -88,20 +88,13 @@ const generateOffer = (type) => {
 export const generateEvent = () => {
   const type = EVENT_TYPES[getRandomInteger(0, EVENT_TYPES.length - 1)];
   const startDate = dayjs()
-    .subtract(getRandomInteger(0, 5), 'day')
-    .add(getRandomInteger(0, 5), 'day')
-    .subtract(getRandomInteger(0, 10), 'hour')
-    .add(getRandomInteger(0, 10), 'hour')
-    .subtract(getRandomInteger(0, 55), 'minute')
-    .add(getRandomInteger(0, 55), 'minute');
+    .subtract(getRandomInteger(0, 2), 'day')
+    .subtract(getRandomInteger(0, 5), 'hour')
+    .subtract(getRandomInteger(0, 55), 'minute');
   const endDate = dayjs(startDate)
-    .subtract(getRandomInteger(0, 5), 'day')
-    .add(getRandomInteger(0, 5), 'day')
-    .subtract(getRandomInteger(0, 10), 'hour')
-    .add(getRandomInteger(0, 10), 'hour')
-    .subtract(getRandomInteger(0, 55), 'minute')
-    .add(getRandomInteger(0, 55), 'minute');
-  const duration = endDate.diff(startDate, 'minute');
+    .add(getRandomInteger(1, 5), 'day')
+    .add(getRandomInteger(1, 10), 'hour')
+    .add(getRandomInteger(5, 55), 'minute');
   const offers = new Array(getRandomInteger(0, MAX_NUMBER_OF_OFFERS)).fill().map(() => generateOffer(type));
 
   return {
@@ -109,7 +102,6 @@ export const generateEvent = () => {
     price: getRandomInteger(1, 10) * 100,
     startDate: formatDate(startDate, 'YYYY-MM-DDTHH:mm:ss'),
     endDate: formatDate(endDate, 'YYYY-MM-DDTHH:mm:ss'),
-    duration,
     destination: generateDestination(),
     offers,
     isFavorite: Boolean(getRandomInteger(0, 1)),
