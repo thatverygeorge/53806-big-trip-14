@@ -10,7 +10,7 @@ const createFilterItemTemplate = (filter, isChecked) => {
               value="${filter.name}"
               ${isChecked ? 'checked' : ''}
               ${filter.count === 0 ? 'disabled' : ''}>
-            <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name} &nbsp; ${filter.count}</label>
+            <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name}</label>
           </div>`;
 };
 
