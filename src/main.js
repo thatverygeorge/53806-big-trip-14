@@ -10,7 +10,8 @@ import EventView from './view/event.js';
 import NoEventView from './view/no-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter';
-import {renderCustomElement, RenderPosition, isArrayEmpty} from './util.js';
+import {RenderPosition, renderCustomElement, replace} from './util/render.js';
+import {isArrayEmpty} from './util/common.js';
 import dayjs from 'dayjs';
 
 const events = new Array(EVENTS_COUNT)
@@ -22,10 +23,10 @@ const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 
 const navigationElement = siteHeaderElement.querySelector('.trip-controls__navigation');
-renderCustomElement(navigationElement, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
+renderCustomElement(navigationElement, new SiteMenuView(), RenderPosition.BEFOREEND);
 
 const filterElement = siteHeaderElement.querySelector('.trip-controls__filters');
-renderCustomElement(filterElement, new FiltersView(generateFilter(events)).getElement(), RenderPosition.BEFOREEND);
+renderCustomElement(filterElement, new FiltersView(generateFilter(events)), RenderPosition.BEFOREEND);
 
 const pageMain = document.querySelector('.page-main');
 const tripEventsElement = pageMain.querySelector('.trip-events');
@@ -35,11 +36,11 @@ const renderEvent = (eventsList, event) => {
   const eventFormEditCopmponent = new EventFormEditView(event);
 
   const replaceEventToForm = () => {
-    eventsList.replaceChild(eventFormEditCopmponent.getElement(), eventComponent.getElement());
+    replace(eventFormEditCopmponent, eventComponent);
   };
 
   const replaceFormToEvent = () => {
-    eventsList.replaceChild(eventComponent.getElement(), eventFormEditCopmponent.getElement());
+    replace(eventComponent, eventFormEditCopmponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -50,38 +51,37 @@ const renderEvent = (eventsList, event) => {
     }
   };
 
-  eventComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  eventComponent.setEditButtonClickHadler(() => {
     replaceEventToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  eventFormEditCopmponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  eventFormEditCopmponent.setEditFormSubmitHadler(() => {
     replaceFormToEvent();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  eventFormEditCopmponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  eventFormEditCopmponent.setEditButtonClickHadler(() => {
     replaceFormToEvent();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  renderCustomElement(eventsList, eventComponent.getElement(), RenderPosition.BEFOREEND);
+  renderCustomElement(eventsList, eventComponent, RenderPosition.BEFOREEND);
 };
 
 if (isArrayEmpty(events)) {
-  renderCustomElement(tripEventsElement, new NoEventView().getElement(), RenderPosition.BEFOREEND);
+  renderCustomElement(tripEventsElement, new NoEventView(), RenderPosition.BEFOREEND);
 } else {
   const tripInfoComponent = new TripInfoView(events);
-  renderCustomElement(tripMainElement, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
-  renderCustomElement(tripInfoComponent.getElement(), new TripCostView(events).getElement(), RenderPosition.BEFOREEND);
+  renderCustomElement(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
+  renderCustomElement(tripInfoComponent, new TripCostView(events), RenderPosition.BEFOREEND);
 
-  renderCustomElement(tripEventsElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+  renderCustomElement(tripEventsElement, new SortView(), RenderPosition.BEFOREEND);
 
   const tripEventsListComponent = new EventsListView();
-  renderCustomElement(tripEventsElement, tripEventsListComponent.getElement(), RenderPosition.BEFOREEND);
+  renderCustomElement(tripEventsElement, tripEventsListComponent, RenderPosition.BEFOREEND);
 
   for (let i = 0; i < EVENTS_COUNT; i++) {
-    renderEvent(tripEventsListComponent.getElement(), events[i]);
+    renderEvent(tripEventsListComponent, events[i]);
   }
 }
