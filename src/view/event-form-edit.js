@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
-import {formatDate, createCustomElement, isArrayEmpty, isStringEmpty} from '../util.js';
+import {formatDate} from '../util/event.js';
+import {isArrayEmpty, isStringEmpty} from '../util/common';
 import {EVENT_TYPES} from '../const.js';
+import AbstractView from './abstract.js';
 
 const BLANK_EVENT = {
   type: 'flight',
@@ -123,25 +125,36 @@ export const createEventFormEditTemplate = (event) => {
           </li>`;
 };
 
-export default class EventFormEdit {
+export default class EventFormEdit extends AbstractView {
   constructor(event = BLANK_EVENT) {
-    this._element = null;
+    super();
     this._event = event;
+
+    this._editButtonClickHadler = this._editButtonClickHadler.bind(this);
+    this._editFormSubmitHadler = this._editFormSubmitHadler.bind(this);
   }
 
   getTemplate() {
     return createEventFormEditTemplate(this._event);
   }
 
-  getElement() {
-    if(!this._element) {
-      this._element = createCustomElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editButtonClickHadler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  _editFormSubmitHadler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setEditButtonClickHadler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editButtonClickHadler);
+  }
+
+  setEditFormSubmitHadler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('.event--edit').addEventListener('submit', this._editFormSubmitHadler);
   }
 }

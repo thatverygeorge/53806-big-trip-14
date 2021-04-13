@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
-import {getRandomInteger, formatDate} from '../util.js';
+import {getRandomInteger} from '../util/common.js';
+import {formatDate} from '../util/event.js';
+
 import {
   EVENT_TYPES,
   DESTINATIONS,

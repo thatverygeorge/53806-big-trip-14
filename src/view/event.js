@@ -1,4 +1,5 @@
-import {formatDate, getDuration, createCustomElement} from '../util.js';
+import {formatDate, getDuration} from '../util/event.js';
+import AbstractView from './abstract.js';
 
 const createOfferTemplate = (offers) => {
   return offers.map((offer) => {
@@ -56,25 +57,25 @@ export const createEventTemplate = (event) => {
           </li>`;
 };
 
-export default class Event {
+export default class Event extends AbstractView {
   constructor(event) {
-    this._element = null;
+    super();
     this._event = event;
+
+    this._editButtonClickHadler = this._editButtonClickHadler.bind(this);
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if(!this._element) {
-      this._element = createCustomElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editButtonClickHadler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHadler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editButtonClickHadler);
   }
 }
