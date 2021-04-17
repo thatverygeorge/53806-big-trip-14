@@ -130,31 +130,31 @@ export default class EventFormEdit extends AbstractView {
     super();
     this._event = event;
 
-    this._editButtonClickHadler = this._editButtonClickHadler.bind(this);
-    this._editFormSubmitHadler = this._editFormSubmitHadler.bind(this);
+    this._editButtonClickHandler = this._editButtonClickHandler.bind(this);
+    this._editFormSubmitHandler = this._editFormSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEventFormEditTemplate(this._event);
   }
 
-  _editButtonClickHadler(evt) {
+  _editButtonClickHandler(evt) {
     evt.preventDefault();
     this._callback.editClick();
   }
 
-  _editFormSubmitHadler(evt) {
+  _editFormSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._event);
   }
 
-  setEditButtonClickHadler(callback) {
+  setEditButtonClickHandler(callback) {
     this._callback.editClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editButtonClickHadler);
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editButtonClickHandler);
   }
 
-  setEditFormSubmitHadler(callback) {
+  setEditFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector('.event--edit').addEventListener('submit', this._editFormSubmitHadler);
+    this.getElement().querySelector('.event--edit').addEventListener('submit', this._editFormSubmitHandler);
   }
 }
