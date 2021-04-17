@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import {getRandomInteger} from '../util/common.js';
 import {formatDate} from '../util/event.js';
 
@@ -100,6 +101,7 @@ export const generateEvent = () => {
   const offers = new Array(getRandomInteger(0, MAX_NUMBER_OF_OFFERS)).fill().map(() => generateOffer(type));
 
   return {
+    id: nanoid(),
     type,
     price: getRandomInteger(1, 10) * 100,
     startDate: formatDate(startDate, 'YYYY-MM-DDTHH:mm:ss'),

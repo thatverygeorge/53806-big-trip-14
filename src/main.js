@@ -1,17 +1,10 @@
 import {EVENTS_COUNT} from './const.js';
-import TripInfoView from './view/trip-info.js';
 import SiteMenuView from './view/site-menu.js';
-import TripCostView from './view/trip-cost.js';
 import FiltersView from './view/filter.js';
-import SortView from './view/sort.js';
-import EventsListView from './view/events-list.js';
-import EventFormEditView from './view/event-form-edit.js';
-import EventView from './view/event.js';
-import NoEventView from './view/no-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter';
-import {RenderPosition, renderCustomElement, replace} from './util/render.js';
-import {isArrayEmpty} from './util/common.js';
+import {RenderPosition, renderCustomElement} from './util/render.js';
+import EventsListPresenter from './presenter/events-list.js';
 import dayjs from 'dayjs';
 
 const events = new Array(EVENTS_COUNT)
@@ -31,57 +24,5 @@ renderCustomElement(filterElement, new FiltersView(generateFilter(events)), Rend
 const pageMain = document.querySelector('.page-main');
 const tripEventsElement = pageMain.querySelector('.trip-events');
 
-const renderEvent = (eventsList, event) => {
-  const eventComponent = new EventView(event);
-  const eventFormEditCopmponent = new EventFormEditView(event);
-
-  const replaceEventToForm = () => {
-    replace(eventFormEditCopmponent, eventComponent);
-  };
-
-  const replaceFormToEvent = () => {
-    replace(eventComponent, eventFormEditCopmponent);
-  };
-
-  const onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      replaceFormToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
-  };
-
-  eventComponent.setEditButtonClickHadler(() => {
-    replaceEventToForm();
-    document.addEventListener('keydown', onEscKeyDown);
-  });
-
-  eventFormEditCopmponent.setEditFormSubmitHadler(() => {
-    replaceFormToEvent();
-    document.removeEventListener('keydown', onEscKeyDown);
-  });
-
-  eventFormEditCopmponent.setEditButtonClickHadler(() => {
-    replaceFormToEvent();
-    document.removeEventListener('keydown', onEscKeyDown);
-  });
-
-  renderCustomElement(eventsList, eventComponent, RenderPosition.BEFOREEND);
-};
-
-if (isArrayEmpty(events)) {
-  renderCustomElement(tripEventsElement, new NoEventView(), RenderPosition.BEFOREEND);
-} else {
-  const tripInfoComponent = new TripInfoView(events);
-  renderCustomElement(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
-  renderCustomElement(tripInfoComponent, new TripCostView(events), RenderPosition.BEFOREEND);
-
-  renderCustomElement(tripEventsElement, new SortView(), RenderPosition.BEFOREEND);
-
-  const tripEventsListComponent = new EventsListView();
-  renderCustomElement(tripEventsElement, tripEventsListComponent, RenderPosition.BEFOREEND);
-
-  for (let i = 0; i < EVENTS_COUNT; i++) {
-    renderEvent(tripEventsListComponent, events[i]);
-  }
-}
+const eventsListPresenter = new EventsListPresenter(tripMainElement, tripEventsElement);
+eventsListPresenter.init(events);
