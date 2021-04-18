@@ -1,5 +1,4 @@
-import dayjs from 'dayjs';
-import {formatDate} from '../util/event.js';
+import {formatDate, sortEventsByDateUp} from '../util/event.js';
 import AbstractView from './abstract.js';
 
 const getTripStartAndEndDates = (events) => {
@@ -31,7 +30,7 @@ const getTripInfoTitle = (destinationsNames) => {
 };
 
 export const createTripInfoTemplate = (events) => {
-  events = events.sort((eventA, eventB) => dayjs(eventA.startDate).valueOf() - dayjs(eventB.startDate).valueOf());
+  events = events.slice().sort(sortEventsByDateUp);
   const [startDate, endDate] = getTripStartAndEndDates(events);
   const destinationsNames = events.map((currentEvent) => currentEvent.destination.name);
   const tripInfoTitle = getTripInfoTitle(destinationsNames);

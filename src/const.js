@@ -14,3 +14,8 @@ export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing
   'In rutrum ac purus sit amet tempus'];
 export const MAX_NUMBER_OF_SENTENCES = 5;
 export const MAX_NUMBER_OF_OFFERS = 5;
+export const SortType = {
+  DEFAULT: 'default',
+  PRICE_DOWN: 'price-down',
+  DURATION_DOWN: 'duration-down',
+};

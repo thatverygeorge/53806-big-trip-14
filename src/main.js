@@ -5,12 +5,9 @@ import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter';
 import {RenderPosition, renderCustomElement} from './util/render.js';
 import EventsListPresenter from './presenter/events-list.js';
-import dayjs from 'dayjs';
+import {sortEventsByDateUp} from './util/event.js';
 
-const events = new Array(EVENTS_COUNT)
-  .fill()
-  .map(generateEvent)
-  .sort((eventA, eventB) => dayjs(eventA.startDate).valueOf() - dayjs(eventB.startDate).valueOf());
+const events = new Array(EVENTS_COUNT).fill().map(generateEvent).sort(sortEventsByDateUp);
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
