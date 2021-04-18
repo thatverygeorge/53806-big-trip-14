@@ -6,11 +6,15 @@ import NoEventView from '../view/no-event.js';
 import {RenderPosition, renderCustomElement, remove} from '../util/render.js';
 import {isArrayEmpty, updateItem} from '../util/common.js';
 import EventPresenter from './event.js';
+import {sortEventsByPriceDown, sortEventsByDurationDown} from '../util/event.js';
+import {SortType} from '../const.js';
 
 export default class EventsList {
   constructor(tripMainElement, tripEventsElement) {
     this._tripMainElement = tripMainElement;
     this._tripEventsElement = tripEventsElement;
+
+    this._currentSortType = SortType.DEFAULT;
 
     this._noEventComponent = new NoEventView();
     this._sortComponent = new SortView();
@@ -22,10 +26,22 @@ export default class EventsList {
 
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(events) {
     this._events = events.slice();
+    this._sourcedEvents = events.slice();
+    this._renderEventsList();
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortTasks(sortType);
+    this._clearEventsList();
     this._renderEventsList();
   }
 
@@ -33,8 +49,25 @@ export default class EventsList {
     Object.values(this._eventsPresenters).forEach((presenter) => presenter.resetView());
   }
 
+  _sortTasks(sortType) {
+    switch (sortType) {
+      case SortType.PRICE_DOWN:
+        this._events.sort(sortEventsByPriceDown);
+        break;
+      case SortType.DURATION_DOWN:
+        this._events.sort(sortEventsByDurationDown);
+        break;
+      default:
+        this._events = this._sourcedEvents.slice();
+        break;
+    }
+
+    this._currentSortType = sortType;
+  }
+
   _handleEventChange(updatedEvent) {
     this._events = updateItem(this._events, updatedEvent);
+    this._sourcedEvents = updateItem(this._sourcedEvents, updatedEvent);
     this._eventsPresenters[updatedEvent.id].init(updatedEvent);
   }
 
@@ -50,6 +83,7 @@ export default class EventsList {
 
   _renderSort() {
     renderCustomElement(this._tripEventsElement, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderList() {
@@ -75,13 +109,11 @@ export default class EventsList {
 
   _clearEventsList() {
     Object.values(this._eventsPresenters).forEach((presenter) => presenter.destroy());
+    this._eventsPresenters = {};
 
     remove(this._tripInfoComponent);
     remove(this._tripCostComponent);
-    remove(this._sortComponent);
     remove(this._eventsListComponent);
-
-    this._renderNoEvents();
   }
 
   _renderEventsList() {

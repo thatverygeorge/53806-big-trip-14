@@ -29,3 +29,17 @@ export const getDuration = (startDate, endDate) => {
     return `${days}D ${hours}H ${minutes}M`;
   }
 };
+
+export const sortEventsByDateUp = (eventA, eventB) => {
+  return dayjs(eventA.startDate).valueOf() - dayjs(eventB.startDate).valueOf();
+};
+
+export const sortEventsByPriceDown = (eventA, eventB) => {
+  return dayjs(eventB.price).valueOf() - dayjs(eventA.price).valueOf();
+};
+
+export const sortEventsByDurationDown = (eventA, eventB) => {
+  const eventADuration = dayjs(eventA.endDate).diff(dayjs(eventA.startDate));
+  const eventBDuration = dayjs(eventB.endDate).diff(dayjs(eventB.startDate));
+  return eventBDuration - eventADuration;
+};
