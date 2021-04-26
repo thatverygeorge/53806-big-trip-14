@@ -26,9 +26,9 @@ const getRandomDescription = () => {
   return `${finalDescription.join('. ')}.`;
 };
 
-const generateDestination = () => {
+export const generateDestination = (givenName) => {
   const description = getRandomDescription();
-  const name = DESTINATIONS[getRandomInteger(0, DESTINATIONS.length - 1)];
+  const name = givenName ? givenName : DESTINATIONS[getRandomInteger(0, DESTINATIONS.length - 1)];
 
   return {
     description,
@@ -58,7 +58,7 @@ const generateDestination = () => {
   };
 };
 
-const generateOffer = (type) => {
+export const generateOffer = (type, isChecked) => {
   switch (type) {
     case 'taxi':
     case 'bus':
@@ -66,7 +66,7 @@ const generateOffer = (type) => {
       return {
         title: 'Some offer title',
         price: getRandomInteger(1, 10) * 10,
-        isChecked: Boolean(getRandomInteger(0, 1)),
+        isChecked,
       };
     case 'ship':
     case 'transport':
@@ -74,7 +74,7 @@ const generateOffer = (type) => {
       return {
         title: 'Some offer title',
         price: getRandomInteger(1, 10) * 10,
-        isChecked: Boolean(getRandomInteger(0, 1)),
+        isChecked,
       };
     case 'flight':
     case 'check-in':
@@ -83,7 +83,7 @@ const generateOffer = (type) => {
       return {
         title: 'Some offer title',
         price: getRandomInteger(1, 10) * 10,
-        isChecked: Boolean(getRandomInteger(0, 1)),
+        isChecked,
       };
   }
 };
@@ -98,7 +98,7 @@ export const generateEvent = () => {
     .add(getRandomInteger(1, 5), 'day')
     .add(getRandomInteger(1, 10), 'hour')
     .add(getRandomInteger(5, 55), 'minute');
-  const offers = new Array(getRandomInteger(0, MAX_NUMBER_OF_OFFERS)).fill().map(() => generateOffer(type));
+  const offers = new Array(getRandomInteger(0, MAX_NUMBER_OF_OFFERS)).fill().map(() => generateOffer(type, Boolean(getRandomInteger(0, 1))));
 
   return {
     id: nanoid(),

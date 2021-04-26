@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import {formatDate} from '../util/event.js';
-import {isArrayEmpty, isStringEmpty} from '../util/common';
-import {EVENT_TYPES} from '../const.js';
-import AbstractView from './abstract.js';
+import {getRandomInteger, isArrayEmpty, isStringEmpty} from '../util/common.js';
+import {EVENT_TYPES, MAX_NUMBER_OF_OFFERS} from '../const.js';
+import SmartView from './smart.js';
+import {generateDestination, generateOffer} from '../mock/event.js';
 
 const BLANK_EVENT = {
   type: 'flight',
@@ -48,30 +49,32 @@ const createOfferSelectorTemplate = (offers) => {
   }).join('');
 };
 
-export const createEventFormEditTemplate = (event) => {
+export const createEventFormEditTemplate = (data) => {
+  const {type, destination, startDate, endDate, price, offers, isOffersExist, isDescriptionExists, isPhotosExist} = data;
+
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
               <header class="event__header">
                 <div class="event__type-wrapper">
                   <label class="event__type  event__type-btn" for="event-type-toggle-1">
                     <span class="visually-hidden">Choose event type</span>
-                    <img class="event__type-icon" width="17" height="17" src="img/icons/${event.type}.png" alt="Event type icon">
+                    <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
                   </label>
                   <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
                   <div class="event__type-list">
                     <fieldset class="event__type-group">
                       <legend class="visually-hidden">Event type</legend>
-                      ${createEventTypeInputTemplate(event.type)}
+                      ${createEventTypeInputTemplate(type)}
                     </fieldset>
                   </div>
                 </div>
 
                 <div class="event__field-group  event__field-group--destination">
                   <label class="event__label  event__type-output" for="event-destination-1">
-                    ${event.type}
+                    ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${event.destination.name}" list="destination-list-1">
+                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
                   <datalist id="destination-list-1">
                     <option value="Amsterdam"></option>
                     <option value="Geneva"></option>
@@ -81,10 +84,10 @@ export const createEventFormEditTemplate = (event) => {
 
                 <div class="event__field-group  event__field-group--time">
                   <label class="visually-hidden" for="event-start-time-1">From</label>
-                  <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(event.startDate, 'DD/MM/YY HH:mm')}">
+                  <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startDate, 'DD/MM/YY HH:mm')}">
                   &mdash;
                   <label class="visually-hidden" for="event-end-time-1">To</label>
-                  <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(event.endDate, 'DD/MM/YY HH:mm')}">
+                  <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endDate, 'DD/MM/YY HH:mm')}">
                 </div>
 
                 <div class="event__field-group  event__field-group--price">
@@ -92,7 +95,7 @@ export const createEventFormEditTemplate = (event) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.price}">
+                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -101,22 +104,22 @@ export const createEventFormEditTemplate = (event) => {
                   <span class="visually-hidden">Open event</span>
                 </button>
               </header>
-              <section class="event__details ${isArrayEmpty(event.offers) && isStringEmpty(event.destination.description) && isArrayEmpty(event.destination.photos) ? 'visually-hidden' : ''}">
-                <section class="event__section  event__section--offers ${isArrayEmpty(event.offers) ? 'visually-hidden' : ''}">
+              <section class="event__details ${!isOffersExist && !isDescriptionExists && !isPhotosExist ? 'visually-hidden' : ''}">
+                <section class="event__section  event__section--offers ${!isOffersExist ? 'visually-hidden' : ''}">
                   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                   <div class="event__available-offers">
-                    ${!isArrayEmpty(event.offers) ? createOfferSelectorTemplate(event.offers) : ''}
+                    ${isOffersExist ? createOfferSelectorTemplate(offers) : ''}
                   </div>
                 </section>
 
-                <section class="event__section  event__section--destination ${isStringEmpty(event.destination.description) && isArrayEmpty(event.destination.photos) ? 'visually-hidden' : ''}">
+                <section class="event__section  event__section--destination ${!isDescriptionExists && !isPhotosExist ? 'visually-hidden' : ''}">
                   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                  <p class="event__destination-description ${isStringEmpty(event.destination.description) ? 'visually-hidden' : ''}">${event.destination.description}</p>
+                  <p class="event__destination-description ${!isDescriptionExists ? 'visually-hidden' : ''}">${data.destination.description}</p>
 
-                  <div class="event__photos-container ${isArrayEmpty(event.destination.photos) ? 'visually-hidden' : ''}">
+                  <div class="event__photos-container ${!isPhotosExist ? 'visually-hidden' : ''}">
                     <div class="event__photos-tape">
-                      ${!isArrayEmpty(event.destination.photos) ? createPhotoTemplate(event.destination.photos) : ''}
+                      ${isPhotosExist ? createPhotoTemplate(destination.photos) : ''}
                     </div>
                   </div>
                 </section>
@@ -125,17 +128,63 @@ export const createEventFormEditTemplate = (event) => {
           </li>`;
 };
 
-export default class EventFormEdit extends AbstractView {
+export default class EventFormEdit extends SmartView {
   constructor(event = BLANK_EVENT) {
     super();
-    this._event = event;
+    this._data = EventFormEdit.parseEventToState(event);
 
     this._editButtonClickHandler = this._editButtonClickHandler.bind(this);
     this._editFormSubmitHandler = this._editFormSubmitHandler.bind(this);
+
+    this._eventTypeToggleHandler = this._eventTypeToggleHandler.bind(this);
+    this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createEventFormEditTemplate(this._event);
+    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data));
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setEditButtonClickHandler(this._callback.editClick);
+    this.setEditFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  reset(event) {
+    this.updateData(
+      EventFormEdit.parseEventToState(event),
+    );
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector('.event__type-group')
+      .addEventListener('click', this._eventTypeToggleHandler);
+    this.getElement()
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this._destinationToggleHandler);
+  }
+
+  _eventTypeToggleHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.matches('.event__type-label')) {
+      const type = evt.target.textContent;
+      const offers = new Array(getRandomInteger(0, MAX_NUMBER_OF_OFFERS)).fill().map(() => generateOffer(type, false));
+      this.updateData({
+        type,
+        offers,
+      });
+    }
+  }
+
+  _destinationToggleHandler(evt) {
+    evt.preventDefault();
+    const destination = generateDestination(evt.target.value);
+    this.updateData({
+      destination,
+    });
   }
 
   _editButtonClickHandler(evt) {
@@ -145,7 +194,7 @@ export default class EventFormEdit extends AbstractView {
 
   _editFormSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._event);
+    this._callback.formSubmit(EventFormEdit.parseStateToEvent(this._data));
   }
 
   setEditButtonClickHandler(callback) {
@@ -156,5 +205,27 @@ export default class EventFormEdit extends AbstractView {
   setEditFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('.event--edit').addEventListener('submit', this._editFormSubmitHandler);
+  }
+
+  static parseEventToState(event) {
+    return Object.assign(
+      {},
+      event,
+      {
+        isOffersExist: !isArrayEmpty(event.offers),
+        isDescriptionExists: !isStringEmpty(event.destination.description),
+        isPhotosExist: !isArrayEmpty(event.destination.photos),
+      },
+    );
+  }
+
+  static parseStateToEvent(data) {
+    data = Object.assign({}, data);
+
+    delete data.isOffersExist;
+    delete data.isDescriptionExists;
+    delete data.isPhotosExist;
+
+    return data;
   }
 }
