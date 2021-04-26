@@ -1,9 +1,12 @@
 import dayjs from 'dayjs';
 import {formatDate} from '../util/event.js';
 import {getRandomInteger, isArrayEmpty, isStringEmpty} from '../util/common.js';
-import {EVENT_TYPES, MAX_NUMBER_OF_OFFERS} from '../const.js';
+import {EVENT_TYPES, MAX_NUMBER_OF_OFFERS, DESTINATIONS} from '../const.js';
 import SmartView from './smart.js';
 import {generateDestination, generateOffer} from '../mock/event.js';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_EVENT = {
   type: 'flight',
@@ -50,7 +53,17 @@ const createOfferSelectorTemplate = (offers) => {
 };
 
 export const createEventFormEditTemplate = (data) => {
-  const {type, destination, startDate, endDate, price, offers, isOffersExist, isDescriptionExists, isPhotosExist} = data;
+  const {
+    type,
+    destination,
+    startDate,
+    endDate,
+    price,
+    offers,
+    isOffersExist,
+    isDescriptionExists,
+    isPhotosExist,
+  } = data;
 
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -132,6 +145,8 @@ export default class EventFormEdit extends SmartView {
   constructor(event = BLANK_EVENT) {
     super();
     this._data = EventFormEdit.parseEventToState(event);
+    this._startDatepicker = null;
+    this._endDatepicker = null;
 
     this._editButtonClickHandler = this._editButtonClickHandler.bind(this);
     this._editFormSubmitHandler = this._editFormSubmitHandler.bind(this);
@@ -139,7 +154,12 @@ export default class EventFormEdit extends SmartView {
     this._eventTypeToggleHandler = this._eventTypeToggleHandler.bind(this);
     this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
 
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+
     this._setInnerHandlers();
+    this._setStartDatepicker();
+    this._setEndDatepicker();
   }
 
   getTemplate() {
@@ -150,12 +170,63 @@ export default class EventFormEdit extends SmartView {
     this._setInnerHandlers();
     this.setEditButtonClickHandler(this._callback.editClick);
     this.setEditFormSubmitHandler(this._callback.formSubmit);
+    this._setStartDatepicker();
+    this._setEndDatepicker();
   }
 
   reset(event) {
     this.updateData(
       EventFormEdit.parseEventToState(event),
     );
+  }
+
+  _setStartDatepicker() {
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+
+    this._startDatepicker = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
+        enableTime: true,
+        time_24hr: true,
+        onClose: this._startDateChangeHandler,
+      },
+    );
+  }
+
+  _setEndDatepicker() {
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
+
+    this._endDatepicker = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
+        minDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
+        enableTime: true,
+        time_24hr: true,
+        onClose: this._endDateChangeHandler,
+      },
+    );
+  }
+
+  _startDateChangeHandler([userDate]) {
+    this.updateData({
+      startDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss'),
+    });
+  }
+
+  _endDateChangeHandler([userDate]) {
+    this.updateData({
+      endDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss'),
+    });
   }
 
   _setInnerHandlers() {
@@ -181,10 +252,12 @@ export default class EventFormEdit extends SmartView {
 
   _destinationToggleHandler(evt) {
     evt.preventDefault();
-    const destination = generateDestination(evt.target.value);
-    this.updateData({
-      destination,
-    });
+    if (DESTINATIONS.includes(evt.target.value)) {
+      const destination = generateDestination(evt.target.value);
+      this.updateData({
+        destination,
+      });
+    }
   }
 
   _editButtonClickHandler(evt) {
