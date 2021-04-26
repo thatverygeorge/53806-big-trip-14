@@ -69,6 +69,7 @@ export default class EventsList {
     this._events = updateItem(this._events, updatedEvent);
     this._sourcedEvents = updateItem(this._sourcedEvents, updatedEvent);
     this._eventsPresenters[updatedEvent.id].init(updatedEvent);
+    this._renderTripInfo(true);
   }
 
   _renderTripInfo() {
