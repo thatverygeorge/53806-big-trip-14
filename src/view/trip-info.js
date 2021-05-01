@@ -1,4 +1,4 @@
-import {formatDate, sortEventsByDateUp} from '../util/event.js';
+import {formatDate, sortEventsByDateUp} from '../utils/event.js';
 import AbstractView from './abstract.js';
 
 const getTripStartAndEndDates = (events) => {

@@ -1,4 +1,4 @@
-import {createCustomElement} from '../util/render.js';
+import {createCustomElement} from '../utils/render.js';
 
 export default class Absctract {
   constructor() {
