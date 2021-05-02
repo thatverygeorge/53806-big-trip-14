@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 export const formatDate = (date, format) => {
   return dayjs(date).format(format);
 };
 
-export const getDuration = (startDate, endDate) => {
-  dayjs.extend(duration);
-  startDate = dayjs(startDate);
-  endDate = dayjs(endDate);
+export const getDuration = (event) => {
+  const startDate = dayjs(event.startDate);
+  const endDate = dayjs(event.endDate);
 
   const difference = endDate.diff(startDate);
 
@@ -18,7 +18,9 @@ export const getDuration = (startDate, endDate) => {
   let hours = dayjs.duration(difference).hours();
   hours = hours > 9 ? hours : `0${hours}`;
 
+  const months = dayjs.duration(difference).months();
   let days = dayjs.duration(difference).days();
+  days = days + (months * 30);
   days = days > 9 ? days : `0${days}`;
 
   if (endDate.diff(startDate, 'minute') < 60) {

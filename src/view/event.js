@@ -1,4 +1,4 @@
-import {formatDate, getDuration} from '../util/event.js';
+import {formatDate, getDuration} from '../utils/event.js';
 import AbstractView from './abstract.js';
 
 const createOfferTemplate = (offers) => {
@@ -35,7 +35,7 @@ export const createEventTemplate = (event) => {
                   &mdash;
                   <time class="event__end-time" datetime="${formatDate(endDate, 'YYYY-MM-DDTHH:mm')}">${formatDate(endDate, 'HH:mm')}</time>
                 </p>
-                <p class="event__duration">${getDuration(startDate, endDate)}</p>
+                <p class="event__duration">${getDuration(event)}</p>
               </div>
               <p class="event__price">
                 &euro;&nbsp;<span class="event__price-value">${price}</span>

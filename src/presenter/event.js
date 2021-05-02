@@ -1,6 +1,7 @@
 import EventFormEditView from '../view/event-form-edit.js';
 import EventView from '../view/event.js';
-import {RenderPosition, renderCustomElement, replace, remove} from '../util/render.js';
+import {RenderPosition, renderCustomElement, replace, remove} from '../utils/render.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -8,13 +9,15 @@ const Mode = {
 };
 
 export default class Event {
-  constructor(eventsListComponent, changeData, changeMode) {
+  constructor(eventsListComponent, changeData, changeMode, offersModel, destinationsModel) {
     this._eventsListComponent = eventsListComponent;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._eventComponent = null;
-    this._eventFormEditCopmponent = null;
+    this._eventFormEditComponent = null;
     this._mode = Mode.DEFAULT;
 
     this._handleEventEditButtonClick = this._handleEventEditButtonClick.bind(this);
@@ -22,23 +25,31 @@ export default class Event {
     this._handleEditFormSubmit = this._handleEditFormSubmit.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._handleFavoriteButtonClick = this._handleFavoriteButtonClick.bind(this);
+    this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
+    this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
+    this._handleDestinationChange = this._handleDestinationChange.bind(this);
   }
 
   init(event) {
     this._event = event;
 
+    this._currentType = this._event.type;
+    this._currentDestinationName = this._event.destination.name;
+
     const prevEventComponent = this._eventComponent;
-    const prevEventFormEditCopmponent = this._eventFormEditCopmponent;
+    const prevEventFormEditCopmponent = this._eventFormEditComponent;
 
     this._eventComponent = new EventView(event);
-    this._eventFormEditCopmponent = new EventFormEditView(event);
+    this._eventFormEditComponent = new EventFormEditView(event);
 
     this._eventComponent.setEditButtonClickHandler(this._handleEventEditButtonClick);
     this._eventComponent.setFavoriteButtonClickHandler(this._handleFavoriteButtonClick);
 
-    this._eventFormEditCopmponent.setEditButtonClickHandler(this._handleFormEditButtonClick);
-    this._eventFormEditCopmponent.setEditFormSubmitHandler(this._handleEditFormSubmit);
-
+    this._eventFormEditComponent.setEditButtonClickHandler(this._handleFormEditButtonClick);
+    this._eventFormEditComponent.setEditFormSubmitHandler(this._handleEditFormSubmit);
+    this._eventFormEditComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
+    this._eventFormEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
+    this._eventFormEditComponent.setDestinationChangeHandler(this._handleDestinationChange);
 
     if (prevEventComponent === null || prevEventFormEditCopmponent === null) {
       renderCustomElement(this._eventsListComponent, this._eventComponent, RenderPosition.BEFOREEND);
@@ -50,7 +61,7 @@ export default class Event {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventFormEditCopmponent, prevEventFormEditCopmponent);
+      replace(this._eventFormEditComponent, prevEventFormEditCopmponent);
     }
 
     remove(prevEventComponent);
@@ -59,7 +70,7 @@ export default class Event {
 
   destroy() {
     remove(this._eventComponent);
-    remove(this._eventFormEditCopmponent);
+    remove(this._eventFormEditComponent);
   }
 
   resetView() {
@@ -69,14 +80,14 @@ export default class Event {
   }
 
   _replaceEventToForm() {
-    replace(this._eventFormEditCopmponent, this._eventComponent);
+    replace(this._eventFormEditComponent, this._eventComponent);
     document.addEventListener('keydown', this._onEscKeyDown);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _replaceFormToEvent() {
-    replace(this._eventComponent, this._eventFormEditCopmponent);
+    replace(this._eventComponent, this._eventFormEditComponent);
     document.removeEventListener('keydown', this._onEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
@@ -84,7 +95,7 @@ export default class Event {
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._eventFormEditCopmponent.reset(this._event);
+      this._eventFormEditComponent.reset(this._event);
       this._replaceFormToEvent();
       document.removeEventListener('keydown', this._onEscKeyDown);
     }
@@ -95,17 +106,30 @@ export default class Event {
   }
 
   _handleFormEditButtonClick() {
-    this._eventFormEditCopmponent.reset(this._event);
+    this._eventFormEditComponent.reset(this._event);
     this._replaceFormToEvent();
   }
 
-  _handleEditFormSubmit(event) {
-    this._changeData(event);
+  _handleEditFormSubmit(update) {
+    const isMinorUpdate =
+      !(this._event.destination.name === update.destination.name) ||
+      !(this._event.startDate === update.startDate) ||
+      !(this._event.endDate === update.endDate) ||
+      !(this._event.price === update.price);
+
+    this._changeData(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
+
     this._replaceFormToEvent();
   }
 
   _handleFavoriteButtonClick() {
     this._changeData(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._event,
@@ -114,5 +138,31 @@ export default class Event {
         },
       ),
     );
+  }
+
+  _handleDeleteButtonClick(event) {
+    this._changeData(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
+  }
+
+  _handleEventTypeChange(type) {
+    if (this._currentType === type) {
+      return;
+    }
+
+    this._currentType = type;
+    return this._offersModel.getOffersByType(type);
+  }
+
+  _handleDestinationChange(name) {
+    if (this._currentDestinationName === name) {
+      return;
+    }
+
+    this._currentDestinationName = name;
+    return this._destinationsModel.getDestinationByName(name);
   }
 }

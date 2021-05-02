@@ -1,6 +1,9 @@
-export const EVENTS_COUNT = 15;
+export const EVENTS_COUNT = 1;
+
 export const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'transport', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 export const DESTINATIONS = ['Amsterdam', 'Chamonix', 'Geneva'];
+
 export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit',
   'Cras aliquet varius magna, non porta ligula feugiat eget',
   'Fusce tristique felis at fermentum pharetra',
@@ -12,10 +15,31 @@ export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing
   'Aliquam erat volutpat',
   'Nunc fermentum tortor ac porta dapibus',
   'In rutrum ac purus sit amet tempus'];
+
 export const MAX_NUMBER_OF_SENTENCES = 5;
+
 export const MAX_NUMBER_OF_OFFERS = 5;
+
 export const SortType = {
   DEFAULT: 'default',
   PRICE_DOWN: 'price-down',
   DURATION_DOWN: 'duration-down',
+};
+
+export const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
 };

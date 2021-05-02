@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
-import {getRandomInteger} from '../util/common.js';
-import {formatDate} from '../util/event.js';
+import {getRandomInteger} from '../utils/common.js';
+import {formatDate} from '../utils/event.js';
 
 import {
   EVENT_TYPES,
@@ -58,13 +58,14 @@ export const generateDestination = (givenName) => {
   };
 };
 
+
 export const generateOffer = (type, isChecked) => {
   switch (type) {
     case 'taxi':
     case 'bus':
     case 'train':
       return {
-        title: 'Some offer title',
+        title: `${nanoid()}`,
         price: getRandomInteger(1, 10) * 10,
         isChecked,
       };
@@ -72,7 +73,7 @@ export const generateOffer = (type, isChecked) => {
     case 'transport':
     case 'drive':
       return {
-        title: 'Some offer title',
+        title: `${nanoid()}`,
         price: getRandomInteger(1, 10) * 10,
         isChecked,
       };
@@ -81,7 +82,7 @@ export const generateOffer = (type, isChecked) => {
     case 'sightseeing':
     case 'restaurant':
       return {
-        title: 'Some offer title',
+        title: `${nanoid()}`,
         price: getRandomInteger(1, 10) * 10,
         isChecked,
       };
