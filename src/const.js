@@ -1,4 +1,4 @@
-export const EVENTS_COUNT = 1;
+export const EVENTS_COUNT = 15;
 
 export const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'transport', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
@@ -42,4 +42,10 @@ export const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PAST: 'past',
+};
+
+export const MenuItem = {
+  ADD_NEW_EVENT: 'ADD_NEW_EVENT',
+  EVENTS: 'EVENTS',
+  STATS: 'STATS',
 };

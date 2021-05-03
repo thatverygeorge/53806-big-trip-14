@@ -9,11 +9,13 @@ import EventNewPresenter from './event-new.js';
 import {sortEventsByDateUp, sortEventsByPriceDown, sortEventsByDurationDown} from '../utils/event.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
+import {hideListStyleLine, showListStyleLine} from '../utils/common.js';
 
 export default class EventsList {
-  constructor(tripMainElement, tripEventsElement, eventsModel, filterModel, offersModel, destinationsModel) {
+  constructor(tripMainElement, tripEventsElement, buttonNew, eventsModel, filterModel, offersModel, destinationsModel) {
     this._tripMainElement = tripMainElement;
     this._tripEventsElement = tripEventsElement;
+    this._buttonNew = buttonNew;
 
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
@@ -35,21 +37,36 @@ export default class EventsList {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._eventsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     this._eventsPresenters = {};
     this._eventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._noEventComponent, this._handleViewAction, this._offersModel, this._destinationsModel);
   }
 
   init() {
+    this._buttonNew.disabled = false;
+
+    this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderEventsList();
   }
 
-  createEvent(buttonNew) {
+  destroy() {
+    this._buttonNew.disabled = true;
+    this._buttonNew.blur();
+
+    this._clearEventsList();
+
+    remove(this._noEventComponent);
+    remove(this._sortComponent);
+
+    this._eventsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createEvent() {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init(buttonNew);
+    this._eventNewPresenter.init(this._buttonNew);
   }
 
   _getEvents(isSource) {
@@ -120,11 +137,19 @@ export default class EventsList {
   }
 
   _renderTripInfo() {
+    if (this._tripInfoComponent !== null) {
+      remove(this._tripInfoComponent);
+      this._tripInfoComponent = null;
+    }
     this._tripInfoComponent = new TripInfoView(this._getEvents(true));
     renderCustomElement(this._tripMainElement, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripCost() {
+    if (this._tripCostComponent !== null) {
+      remove(this._tripCostComponent);
+      this._tripCostComponent = null;
+    }
     this._tripCostComponent = new TripCostView(this._getEvents(true));
     renderCustomElement(this._tripInfoComponent, this._tripCostComponent, RenderPosition.BEFOREEND);
   }
@@ -155,6 +180,7 @@ export default class EventsList {
   }
 
   _renderNoEvents() {
+    hideListStyleLine();
     renderCustomElement(this._tripEventsElement, this._noEventComponent, RenderPosition.BEFOREEND);
   }
 
@@ -163,8 +189,6 @@ export default class EventsList {
     Object.values(this._eventsPresenters).forEach((presenter) => presenter.destroy());
     this._eventsPresenters = {};
 
-    remove(this._tripInfoComponent);
-    remove(this._tripCostComponent);
     remove(this._sortComponent);
 
     if (resetSortType) {
@@ -177,6 +201,8 @@ export default class EventsList {
       this._renderNoEvents();
     } else {
       remove(this._noEventComponent);
+
+      showListStyleLine();
 
       this._renderTripInfo();
       this._renderTripCost();
