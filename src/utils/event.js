@@ -1,9 +1,28 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
 dayjs.extend(duration);
 
 export const formatDate = (date, format) => {
   return dayjs(date).format(format);
+};
+
+export const formatDuration = (duration) => {
+  let days = dayjs.duration(duration).days();
+  let hours = dayjs.duration(duration).hours();
+  let minutes = dayjs.duration(duration).minutes();
+
+  days = days > 9 ? days : `0${days}`;
+  hours = hours > 9 ? hours : `0${hours}`;
+  minutes = minutes > 9 ? minutes : `0${minutes}`;
+
+  if (hours === 0 || hours === '00') {
+    return `${minutes}M`;
+  } else if (days === 0 || days === '00') {
+    return `${hours}H ${minutes}M`;
+  }
+
+  return `${days}D ${hours}H ${minutes}M`;
 };
 
 export const getDuration = (event) => {
@@ -12,24 +31,24 @@ export const getDuration = (event) => {
 
   const difference = endDate.diff(startDate);
 
-  let minutes = dayjs.duration(difference).minutes();
-  minutes = minutes > 9 ? minutes : `0${minutes}`;
+  return formatDuration(dayjs.duration(difference).asMilliseconds());
 
-  let hours = dayjs.duration(difference).hours();
-  hours = hours > 9 ? hours : `0${hours}`;
+  // let minutes = dayjs.duration(difference).minutes();
+  // minutes = minutes > 9 ? minutes : `0${minutes}`;
 
-  const months = dayjs.duration(difference).months();
-  let days = dayjs.duration(difference).days();
-  days = days + (months * 30);
-  days = days > 9 ? days : `0${days}`;
+  // let hours = dayjs.duration(difference).hours();
+  // hours = hours > 9 ? hours : `0${hours}`;
 
-  if (endDate.diff(startDate, 'minute') < 60) {
-    return `${minutes}M`;
-  } else if (endDate.diff(startDate, 'hour') < 24) {
-    return `${hours}H ${minutes}M`;
-  } else {
-    return `${days}D ${hours}H ${minutes}M`;
-  }
+  // let days = dayjs.duration(difference).days();
+  // days = days > 9 ? days : `0${days}`;
+
+  // if (endDate.diff(startDate, 'minute') < 60) {
+  //   return `${minutes}M`;
+  // } else if (endDate.diff(startDate, 'hour') < 24) {
+  //   return `${hours}H ${minutes}M`;
+  // }
+
+  // return `${days}D ${hours}H ${minutes}M`;
 };
 
 export const sortEventsByDateUp = (eventA, eventB) => {

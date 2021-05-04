@@ -78,6 +78,7 @@ export default class EventNew {
 
     this._buttonNew.disabled = false;
     document.removeEventListener('keydown', this._escKeyDownHandler);
+
   }
 
   _handleEditFormSubmit(event) {

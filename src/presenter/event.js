@@ -111,15 +111,10 @@ export default class Event {
   }
 
   _handleEditFormSubmit(update) {
-    const isMinorUpdate =
-      !(this._event.destination.name === update.destination.name) ||
-      !(this._event.startDate === update.startDate) ||
-      !(this._event.endDate === update.endDate) ||
-      !(this._event.price === update.price);
 
     this._changeData(
       UserAction.UPDATE_EVENT,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      UpdateType.MINOR,
       update,
     );
 
