@@ -40,7 +40,7 @@ export default class Event {
     const prevEventFormEditCopmponent = this._eventFormEditComponent;
 
     this._eventComponent = new EventView(event);
-    this._eventFormEditComponent = new EventFormEditView(event);
+    this._eventFormEditComponent = new EventFormEditView(event, this._destinationsModel.getDestinationsNames(), this._offersModel.getOffersTypes());
 
     this._eventComponent.setEditButtonClickHandler(this._handleEventEditButtonClick);
     this._eventComponent.setFavoriteButtonClickHandler(this._handleFavoriteButtonClick);

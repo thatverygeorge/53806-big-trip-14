@@ -1,5 +1,4 @@
-import {EVENTS_COUNT, DESTINATIONS, MenuItem, UpdateType, FilterType} from './const.js';
-import {generateEvent} from './mock/event.js';
+import {MenuItem, UpdateType, FilterType} from './const.js';
 import {RenderPosition, renderCustomElement, remove} from './utils/render.js';
 import {hideListStyleLine} from './utils/common.js';
 import {sortEventsByDateUp} from './utils/event.js';
@@ -11,36 +10,35 @@ import SiteMenuView from './view/site-menu.js';
 import StatsView from './view/stats.js';
 import FilterPresenter from './presenter/filter.js';
 import EventsListPresenter from './presenter/events-list.js';
+import Api from './api.js';
 
-const events = new Array(EVENTS_COUNT).fill().map(generateEvent).sort(sortEventsByDateUp);
+const AUTHORIZATION = 'Basic k8buZ9Gca8GXk5H';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const eventsModel = new EventsModel();
-eventsModel.setEvents(events);
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 
 const navigationElement = siteHeaderElement.querySelector('.trip-controls__navigation');
-
 const siteMenuComponent = new SiteMenuView();
-renderCustomElement(navigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
 const filterElement = siteHeaderElement.querySelector('.trip-controls__filters');
 const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(filterElement, filterModel, eventsModel);
 filterPresenter.init();
 
-const offersModel = new OffersModel();
-
 const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(DESTINATIONS);
+const offersModel = new OffersModel();
 
 const pageMain = document.querySelector('.page-main');
 const tripEventsElement = pageMain.querySelector('.trip-events');
 
 const buttonNew = document.querySelector('.trip-main__event-add-btn');
 
-const eventsListPresenter = new EventsListPresenter(tripMainElement, tripEventsElement, buttonNew, eventsModel, filterModel, offersModel, destinationsModel);
+const eventsListPresenter = new EventsListPresenter(tripMainElement, tripEventsElement, buttonNew, eventsModel, filterModel, offersModel, destinationsModel, api);
 eventsListPresenter.init();
 
 buttonNew.addEventListener('click', (evt) => {
@@ -76,4 +74,17 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
+renderCustomElement(navigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+
+Promise
+  .all([
+    api.getEvents(),
+    api.getDestinations(),
+    api.getOffers(),
+  ])
+  .then((value) => {
+    offersModel.setOffers(value[2]);
+    destinationsModel.setDestinations(value[1]);
+    eventsModel.setEvents(UpdateType.INIT, value[0].slice().sort(sortEventsByDateUp));
+  });

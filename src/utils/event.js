@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(duration);
+dayjs.extend(utc);
 
 export const formatDate = (date, format) => {
-  return dayjs(date).format(format);
+  return dayjs(date).utc().format(format);
 };
 
 export const formatDuration = (duration) => {
@@ -32,23 +34,6 @@ export const getDuration = (event) => {
   const difference = endDate.diff(startDate);
 
   return formatDuration(dayjs.duration(difference).asMilliseconds());
-
-  // let minutes = dayjs.duration(difference).minutes();
-  // minutes = minutes > 9 ? minutes : `0${minutes}`;
-
-  // let hours = dayjs.duration(difference).hours();
-  // hours = hours > 9 ? hours : `0${hours}`;
-
-  // let days = dayjs.duration(difference).days();
-  // days = days > 9 ? days : `0${days}`;
-
-  // if (endDate.diff(startDate, 'minute') < 60) {
-  //   return `${minutes}M`;
-  // } else if (endDate.diff(startDate, 'hour') < 24) {
-  //   return `${hours}H ${minutes}M`;
-  // }
-
-  // return `${days}D ${hours}H ${minutes}M`;
 };
 
 export const sortEventsByDateUp = (eventA, eventB) => {
