@@ -83,8 +83,8 @@ Promise
     api.getDestinations(),
     api.getOffers(),
   ])
-  .then((value) => {
-    offersModel.setOffers(value[2]);
-    destinationsModel.setDestinations(value[1]);
-    eventsModel.setEvents(UpdateType.INIT, value[0].slice().sort(sortEventsByDateUp));
+  .then(([events, destinations, offers]) => {
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations);
+    eventsModel.setEvents(UpdateType.INIT, events.slice().sort(sortEventsByDateUp));
   });

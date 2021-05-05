@@ -5,7 +5,7 @@ import EventsListView from '../view/events-list.js';
 import NoEventView from '../view/no-event.js';
 import LoadingView from '../view/loading.js';
 import {RenderPosition, renderCustomElement, remove} from '../utils/render.js';
-import EventPresenter from './event.js';
+import EventPresenter, {State as EventPresenterViewState} from './event.js';
 import EventNewPresenter from './event-new.js';
 import {sortEventsByDateUp, sortEventsByPriceDown, sortEventsByDurationDown} from '../utils/event.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
@@ -112,15 +112,34 @@ export default class EventsList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this._api.updateEvent(update).then((response) => {
-          this._eventsModel.updateEvent(updateType, response);
-        });
+        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.SAVING);
+        this._api.updateEvent(update)
+          .then((response) => {
+            this._eventsModel.updateEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
         break;
       case UserAction.ADD_EVENT:
-        this._eventsModel.addEvent(updateType, update);
+        this._eventNewPresenter.setSaving();
+        this._api.addEvent(update)
+          .then((response) => {
+            this._eventsModel.addEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_EVENT:
-        this._eventsModel.deleteEvent(updateType, update);
+        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.DELETING);
+        this._api.deleteEvent(update)
+          .then(() => {
+            this._eventsModel.deleteEvent(updateType, update);
+          })
+          .catch(() => {
+            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
         break;
     }
   }

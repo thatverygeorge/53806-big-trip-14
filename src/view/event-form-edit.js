@@ -9,8 +9,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 const BLANK_EVENT = {
   type: 'flight',
   price: '',
-  startDate: dayjs(),
-  endDate: dayjs().add(1, 'hour'),
+  startDate: formatDate(dayjs(), 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+  endDate: formatDate(dayjs().add(1, 'hour'), 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
   destination: {
     description: '',
     name: '',
@@ -25,7 +25,7 @@ const createDestinationOptionTemplate = (destinations) => {
   }).join('');
 };
 
-const createEventTypeInputTemplate = (typeToCheck, offersTypes) => {
+const createEventTypeInputTemplate = (typeToCheck, offersTypes, isDisabled) => {
   return offersTypes.map((type) => {
     return `<div class="event__type-item">
               <input id="event-type-${type}-1"
@@ -33,7 +33,8 @@ const createEventTypeInputTemplate = (typeToCheck, offersTypes) => {
                 type="radio"
                 name="event-type"
                 value="${type}"
-                ${type === typeToCheck ? 'checked' : ''}>
+                ${type === typeToCheck ? 'checked' : ''}
+                ${isDisabled ? 'disabled' : ''}>
               <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
             </div>`;
   }).join('');
@@ -47,7 +48,7 @@ const createPhotoTemplate = (photos) => {
 
 let eventID = 0;
 
-const createOfferSelectorTemplate = (offers) => {
+const createOfferSelectorTemplate = (offers, isDisabled) => {
   eventID++;
   let offerID = 0;
   return offers.map((offer) => {
@@ -57,7 +58,8 @@ const createOfferSelectorTemplate = (offers) => {
                 id="event-offer-${eventID}-${offerID}"
                 type="checkbox"
                 name="event-offer-${offerID}"
-                ${offer.isChecked ? 'checked' : ''}>
+                ${offer.isChecked ? 'checked' : ''}
+                ${isDisabled ? 'disabled' : ''}>
               <label class="event__offer-label" for="event-offer-${eventID}-${offerID}">
                 <span class="event__offer-title">${offer.title}</span>
                 &plus;&euro;&nbsp;
@@ -79,6 +81,9 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
     isOffersExist,
     isDescriptionExists,
     isPhotosExist,
+    isDisabled,
+    isSaving,
+    isDeleting,
   } = data;
 
   return `<li class="trip-events__item">
@@ -89,12 +94,12 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                     <span class="visually-hidden">Choose event type</span>
                     <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
                   </label>
-                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
                   <div class="event__type-list">
                     <fieldset class="event__type-group">
                       <legend class="visually-hidden">Event type</legend>
-                      ${createEventTypeInputTemplate(type, offersTypes)}
+                      ${createEventTypeInputTemplate(type, offersTypes, isDisabled)}
                     </fieldset>
                   </div>
                 </div>
@@ -108,7 +113,9 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                     name="event-destination"
                     value="${destination.name}"
                     list="destination-list-1"
-                    autocomplete="off" required>
+                    autocomplete="off"
+                    required
+                    ${isDisabled ? 'disabled' : ''}>
                   <datalist id="destination-list-1">
                     ${createDestinationOptionTemplate(destinationsNames)}
                   </datalist>
@@ -116,10 +123,20 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
 
                 <div class="event__field-group  event__field-group--time">
                   <label class="visually-hidden" for="event-start-time-1">From</label>
-                  <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startDate, 'DD/MM/YY HH:mm')}">
+                  <input class="event__input  event__input--time"
+                    id="event-start-time-1"
+                    type="text"
+                    name="event-start-time"
+                    value="${formatDate(startDate, 'DD/MM/YY HH:mm')}"
+                    ${isDisabled ? 'disabled' : ''}>
                   &mdash;
                   <label class="visually-hidden" for="event-end-time-1">To</label>
-                  <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endDate, 'DD/MM/YY HH:mm')}">
+                  <input class="event__input  event__input--time"
+                    id="event-end-time-1"
+                    type="text"
+                    name="event-end-time"
+                    value="${formatDate(endDate, 'DD/MM/YY HH:mm')}"
+                    ${isDisabled ? 'disabled' : ''}>
                 </div>
 
                 <div class="event__field-group  event__field-group--price">
@@ -127,13 +144,20 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${price}" required>
+                  <input class="event__input  event__input--price"
+                    id="event-price-1"
+                    type="number"
+                    min="0"
+                    name="event-price"
+                    value="${price}"
+                    required
+                    ${isDisabled ? 'disabled' : ''}>
                 </div>
 
-                <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                <button class="event__reset-btn" type="reset">${isNewEvent ? 'Cancel' : 'Delete'}</button>
+                <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+                <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isNewEvent ? 'Cancel' : isDeleting ? 'Deleting...' : 'Delete'}</button>
                 <button class="event__rollup-btn" type="button">
-                  <span class="visually-hidden">Open event</span>
+                  <span class="visually-hidden">Close event</span>
                 </button>
               </header>
               <section class="event__details ${!isOffersExist && !isDescriptionExists && !isPhotosExist ? 'visually-hidden' : ''}">
@@ -141,7 +165,7 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                   <div class="event__available-offers">
-                    ${isOffersExist ? createOfferSelectorTemplate(offers) : ''}
+                    ${isOffersExist ? createOfferSelectorTemplate(offers, isDisabled) : ''}
                   </div>
                 </section>
 
@@ -202,7 +226,7 @@ export default class EventFormEdit extends SmartView {
   }
 
   getTemplate() {
-    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data), this._destinationsNames, this._offersTypes);
+    return createEventFormEditTemplate(this._data, this._destinationsNames, this._offersTypes);
   }
 
   restoreHandlers() {
@@ -271,13 +295,13 @@ export default class EventFormEdit extends SmartView {
 
   _startDateChangeHandler([userDate]) {
     this.updateData({
-      startDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss'),
+      startDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     });
   }
 
   _endDateChangeHandler([userDate]) {
     this.updateData({
-      endDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss'),
+      endDate: formatDate([userDate], 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     });
   }
 
@@ -373,6 +397,9 @@ export default class EventFormEdit extends SmartView {
         isOffersExist: !isArrayEmpty(event.offers),
         isDescriptionExists: !isStringEmpty(event.destination.description),
         isPhotosExist: !isArrayEmpty(event.destination.photos),
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
       },
     );
   }
@@ -384,6 +411,9 @@ export default class EventFormEdit extends SmartView {
     delete data.isOffersExist;
     delete data.isDescriptionExists;
     delete data.isPhotosExist;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   }
