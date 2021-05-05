@@ -1,6 +1,5 @@
 import Observer from '../utils/observer.js';
 import {formatDate} from '../utils/event.js';
-import {getRandomInteger} from '../utils/common.js';
 
 export default class Events extends Observer {
   constructor() {
@@ -76,7 +75,7 @@ export default class Events extends Observer {
         {},
         event.offers[i],
         {
-          isChecked: Boolean(getRandomInteger(0, 1)),
+          isChecked: event.offers[i].isChecked,
         },
       ));
     }
@@ -85,7 +84,6 @@ export default class Events extends Observer {
       {},
       event,
       {
-        id: parseInt(event.id),
         price: event.base_price,
         startDate: event.date_from,
         endDate: event.date_to,
@@ -114,28 +112,15 @@ export default class Events extends Observer {
 
     delete adaptedDestination.photos;
 
-    const adaptedOffers = [];
-
-    for (let i = 0; i < event.offers.length; i++) {
-      adaptedOffers.push(Object.assign(
-        {},
-        event.offers[i],
-      ));
-
-      delete adaptedOffers[i].isChecked;
-    }
-
     const adaptedEvent = Object.assign(
       {},
       event,
       {
-        id: event.id.toString(),
         'base_price': event.price,
         'date_from': formatDate(event.startDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
         'date_to': formatDate(event.endDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-        'is_favorite': event.isFavorite,
+        'is_favorite': event.isFavorite ? event.isFavorite : false,
         destination: adaptedDestination,
-        offers: adaptedOffers,
       },
     );
 

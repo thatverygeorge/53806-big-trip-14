@@ -1,14 +1,14 @@
 import EventFormEditView from '../view/event-form-edit.js';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
 import {remove, renderCustomElement, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
+import { formatDate } from '../utils/event.js';
 
 const BLANK_EVENT = {
   type: 'flight',
   price: '',
-  startDate: dayjs(),
-  endDate: dayjs().add(1, 'hour'),
+  startDate: formatDate(dayjs(), 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+  endDate: formatDate(dayjs().add(1, 'hour'), 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
   destination: {
     description: '',
     name: '',
@@ -52,7 +52,7 @@ export default class EventNew {
 
     BLANK_EVENT.offers = this._offersModel.getOffersByType(BLANK_EVENT.type);
 
-    this._eventFormEditComponent = new EventFormEditView(BLANK_EVENT);
+    this._eventFormEditComponent = new EventFormEditView(BLANK_EVENT, this._destinationsModel.getDestinationsNames(), this._offersModel.getOffersTypes());
     this._eventFormEditComponent.setEditButtonClickHandler(this._handleFormEditButtonClick);
     this._eventFormEditComponent.setEditFormSubmitHandler(this._handleEditFormSubmit);
     this._eventFormEditComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
@@ -78,16 +78,33 @@ export default class EventNew {
 
     this._buttonNew.disabled = false;
     document.removeEventListener('keydown', this._escKeyDownHandler);
+  }
 
+  setSaving() {
+    this._eventFormEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._eventFormEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._eventFormEditComponent.shake(resetFormState);
   }
 
   _handleEditFormSubmit(event) {
     this._changeData(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      Object.assign({id: nanoid()}, event),
+      event,
     );
-    this.destroy();
   }
 
   _handleFormEditButtonClick() {

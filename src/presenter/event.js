@@ -8,6 +8,12 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 export default class Event {
   constructor(eventsListComponent, changeData, changeMode, offersModel, destinationsModel) {
     this._eventsListComponent = eventsListComponent;
@@ -61,7 +67,8 @@ export default class Event {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventFormEditComponent, prevEventFormEditCopmponent);
+      replace(this._eventComponent, prevEventFormEditCopmponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
@@ -76,6 +83,35 @@ export default class Event {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToEvent();
+    }
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._eventFormEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._eventFormEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._eventFormEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._eventFormEditComponent.shake(resetFormState);
+        break;
     }
   }
 
@@ -111,14 +147,11 @@ export default class Event {
   }
 
   _handleEditFormSubmit(update) {
-
     this._changeData(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
       update,
     );
-
-    this._replaceFormToEvent();
   }
 
   _handleFavoriteButtonClick() {
