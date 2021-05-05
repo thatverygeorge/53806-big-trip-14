@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import {formatDate} from '../utils/event.js';
-import {isArrayEmpty, isStringEmpty} from '../utils/common.js';
-import {EVENT_TYPES, DESTINATIONS} from '../const.js';
 import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
+import {isArrayEmpty, isStringEmpty} from '../utils/common.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
@@ -26,8 +25,8 @@ const createDestinationOptionTemplate = (destinations) => {
   }).join('');
 };
 
-const createEventTypeInputTemplate = (typeToCheck) => {
-  return EVENT_TYPES.map((type) => {
+const createEventTypeInputTemplate = (typeToCheck, offersTypes) => {
+  return offersTypes.map((type) => {
     return `<div class="event__type-item">
               <input id="event-type-${type}-1"
                 class="event__type-input  visually-hidden"
@@ -68,7 +67,7 @@ const createOfferSelectorTemplate = (offers) => {
   }).join('');
 };
 
-export const createEventFormEditTemplate = (data) => {
+export const createEventFormEditTemplate = (data, destinationsNames, offersTypes) => {
   const {
     type,
     destination,
@@ -95,7 +94,7 @@ export const createEventFormEditTemplate = (data) => {
                   <div class="event__type-list">
                     <fieldset class="event__type-group">
                       <legend class="visually-hidden">Event type</legend>
-                      ${createEventTypeInputTemplate(type)}
+                      ${createEventTypeInputTemplate(type, offersTypes)}
                     </fieldset>
                   </div>
                 </div>
@@ -111,7 +110,7 @@ export const createEventFormEditTemplate = (data) => {
                     list="destination-list-1"
                     autocomplete="off" required>
                   <datalist id="destination-list-1">
-                    ${createDestinationOptionTemplate(DESTINATIONS)}
+                    ${createDestinationOptionTemplate(destinationsNames)}
                   </datalist>
                 </div>
 
@@ -162,10 +161,12 @@ export const createEventFormEditTemplate = (data) => {
 };
 
 export default class EventFormEdit extends SmartView {
-  constructor(event = BLANK_EVENT) {
+  constructor(event = BLANK_EVENT, destinationsNames, offersTypes) {
     super();
 
     this._data = EventFormEdit.parseEventToState(event);
+    this._destinationsNames = destinationsNames;
+    this._offersTypes = offersTypes;
 
     this._startDatepicker = null;
     this._endDatepicker = null;
@@ -201,7 +202,7 @@ export default class EventFormEdit extends SmartView {
   }
 
   getTemplate() {
-    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data));
+    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data), this._destinationsNames, this._offersTypes);
   }
 
   restoreHandlers() {

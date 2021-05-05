@@ -1,5 +1,4 @@
 import Observer from '../utils/observer.js';
-import {generateDestination} from '../mock/event.js';
 
 export default class Destinations extends Observer {
   constructor() {
@@ -8,15 +7,29 @@ export default class Destinations extends Observer {
     this._destinations = [];
   }
 
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
   getDestinationByName(nameToGetBy) {
     return this._destinations.find((destination) => destination.name === nameToGetBy);
   }
 
-  getDestinations() {
-    return this._destinations;
+  getDestinationsNames() {
+    return this._destinations.map((destination) => destination.name);
   }
 
-  setDestinations(destinations) {
-    this._destinations = destinations.map((destination) => generateDestination(destination));
+  static adaptToClient(destination) {
+    const adaptedDestination = Object.assign(
+      {},
+      destination,
+      {
+        photos: destination.pictures,
+      },
+    );
+
+    delete adaptedDestination.pictures;
+
+    return adaptedDestination;
   }
 }
