@@ -16,7 +16,11 @@ export default class Destinations extends Observer {
   }
 
   getDestinationsNames() {
-    return this._destinations.map((destination) => destination.name);
+    if (this._destinations) {
+      return this._destinations.map((destination) => destination.name);
+    }
+
+    return [];
   }
 
   static adaptToClient(destination) {

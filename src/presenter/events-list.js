@@ -43,6 +43,7 @@ export default class EventsList {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._eventsPresenters = {};
+    this._renderList();
     this._eventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._noEventComponent, this._handleViewAction, this._offersModel, this._destinationsModel);
   }
 
@@ -184,6 +185,7 @@ export default class EventsList {
       remove(this._tripCostComponent);
       this._tripCostComponent = null;
     }
+
     this._tripCostComponent = new TripCostView(this._getEvents(true));
     renderCustomElement(this._tripInfoComponent, this._tripCostComponent, RenderPosition.BEFOREEND);
   }
@@ -228,7 +230,6 @@ export default class EventsList {
     this._eventsPresenters = {};
 
     remove(this._sortComponent);
-    remove(this._loadingComponent);
 
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
@@ -243,6 +244,8 @@ export default class EventsList {
     }
 
     if (this._eventsCount === 0) {
+      remove(this._tripInfoComponent);
+      remove(this._tripCostComponent);
       this._renderNoEvents();
     } else {
       remove(this._noEventComponent);

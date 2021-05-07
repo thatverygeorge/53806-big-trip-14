@@ -14,7 +14,11 @@ export default class Offers extends Observer {
   }
 
   getOffersTypes() {
-    return this._offers.map((offer) => offer.type);
+    if (this._offers) {
+      return this._offers.map((offer) => offer.type);
+    }
+
+    return [];
   }
 
   static adaptToClient(offers) {
@@ -26,7 +30,7 @@ export default class Offers extends Observer {
 
         offers.offers[i],
         {
-          isChecked: false,
+          isChecked: offers.offers[i].isChecked,
         },
       ));
     }

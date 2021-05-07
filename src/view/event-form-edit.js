@@ -226,7 +226,7 @@ export default class EventFormEdit extends SmartView {
   }
 
   getTemplate() {
-    return createEventFormEditTemplate(this._data, this._destinationsNames, this._offersTypes);
+    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data), this._destinationsNames, this._offersTypes);
   }
 
   restoreHandlers() {
@@ -259,6 +259,7 @@ export default class EventFormEdit extends SmartView {
       {
         dateFormat: 'd/m/y H:i',
         defaultDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
+        maxDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
         enableTime: true,
         time_24hr: true,
         onClose: this._startDateChangeHandler,
@@ -397,9 +398,6 @@ export default class EventFormEdit extends SmartView {
         isOffersExist: !isArrayEmpty(event.offers),
         isDescriptionExists: !isStringEmpty(event.destination.description),
         isPhotosExist: !isArrayEmpty(event.destination.photos),
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
       },
     );
   }

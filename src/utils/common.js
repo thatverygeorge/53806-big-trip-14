@@ -15,3 +15,7 @@ export const hideListStyleLine = () => {
 export const showListStyleLine = () => {
   Array.from(containers).forEach((container) => container.classList.remove('page-body__container--without-line'));
 };
+
+export const isOnline = () => {
+  return window.navigator.onLine;
+};
