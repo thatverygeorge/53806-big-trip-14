@@ -2,6 +2,8 @@ import EventFormEditView from '../view/event-form-edit.js';
 import EventView from '../view/event.js';
 import {RenderPosition, renderCustomElement, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -138,6 +140,11 @@ export default class Event {
   }
 
   _handleEventEditButtonClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit task offline');
+      return;
+    }
+
     this._replaceEventToForm();
   }
 
@@ -147,6 +154,11 @@ export default class Event {
   }
 
   _handleEditFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save task offline');
+      return;
+    }
+
     this._changeData(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
@@ -169,6 +181,11 @@ export default class Event {
   }
 
   _handleDeleteButtonClick(event) {
+    if (!isOnline()) {
+      toast('You can\'t delete task offline');
+      return;
+    }
+
     this._changeData(
       UserAction.DELETE_EVENT,
       UpdateType.MINOR,

@@ -2,7 +2,7 @@ import EventFormEditView from '../view/event-form-edit.js';
 import dayjs from 'dayjs';
 import {remove, renderCustomElement, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
-import { formatDate } from '../utils/event.js';
+import {formatDate} from '../utils/event.js';
 
 const BLANK_EVENT = {
   type: 'flight',
@@ -58,6 +58,7 @@ export default class EventNew {
     this._eventFormEditComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
     this._eventFormEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
     this._eventFormEditComponent.setDestinationChangeHandler(this._handleDestinationChange);
+
 
     renderCustomElement(this._eventListContainer, this._eventFormEditComponent, RenderPosition.AFTERBEGIN);
 
