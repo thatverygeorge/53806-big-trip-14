@@ -59,7 +59,6 @@ export default class EventNew {
     this._eventFormEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
     this._eventFormEditComponent.setDestinationChangeHandler(this._handleDestinationChange);
 
-
     renderCustomElement(this._eventListContainer, this._eventFormEditComponent, RenderPosition.AFTERBEGIN);
 
     this._buttonNew.disabled = true;

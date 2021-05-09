@@ -22,29 +22,23 @@ const STORE_VER = 'v14';
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
-
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
 const eventsModel = new EventsModel();
+const destinationsModel = new DestinationsModel();
+const offersModel = new OffersModel();
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
-
-const navigationElement = siteHeaderElement.querySelector('.trip-controls__navigation');
-const siteMenuComponent = new SiteMenuView();
 
 const filterElement = siteHeaderElement.querySelector('.trip-controls__filters');
 const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(filterElement, filterModel, eventsModel);
 filterPresenter.init();
 
-const destinationsModel = new DestinationsModel();
-const offersModel = new OffersModel();
-
 const pageMain = document.querySelector('.page-main');
 const tripEventsElement = pageMain.querySelector('.trip-events');
-
 const buttonNew = document.querySelector('.trip-main__event-add-btn');
 
 const eventsListPresenter = new EventsListPresenter(tripMainElement, tripEventsElement, buttonNew, eventsModel, filterModel, offersModel, destinationsModel, apiWithProvider);
@@ -65,6 +59,8 @@ buttonNew.addEventListener('click', (evt) => {
   eventsListPresenter.createEvent();
 });
 
+const navigationElement = siteHeaderElement.querySelector('.trip-controls__navigation');
+const siteMenuComponent = new SiteMenuView();
 let statisticsComponent = null;
 
 const handleSiteMenuClick = (menuItem) => {

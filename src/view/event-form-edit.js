@@ -213,6 +213,10 @@ export default class EventFormEdit extends SmartView {
     this._setEndDatepicker();
   }
 
+  getTemplate() {
+    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data), this._destinationsNames, this._offersTypes);
+  }
+
   removeElement() {
     super.removeElement();
 
@@ -223,10 +227,6 @@ export default class EventFormEdit extends SmartView {
       this._endDatepicker.destroy();
       this._endDatepicker = null;
     }
-  }
-
-  getTemplate() {
-    return createEventFormEditTemplate(EventFormEdit.parseEventToState(this._data), this._destinationsNames, this._offersTypes);
   }
 
   restoreHandlers() {

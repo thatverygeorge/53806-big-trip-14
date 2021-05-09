@@ -261,6 +261,10 @@ export default class Stats extends SmartView {
     this._setCharts();
   }
 
+  getTemplate() {
+    return createStatsTemplate();
+  }
+
   removeElement() {
     super.removeElement();
 
@@ -269,10 +273,6 @@ export default class Stats extends SmartView {
       this._typeChart = null;
       this._timeChart = null;
     }
-  }
-
-  getTemplate() {
-    return createStatsTemplate();
   }
 
   restoreHandlers() {
