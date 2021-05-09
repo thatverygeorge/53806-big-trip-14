@@ -95,82 +95,6 @@ export default class EventsList {
     return filtredEvents.sort(sortEventsByDateUp);
   }
 
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._currentSortType = sortType;
-    this._clearEventsList();
-    this._renderEventsList();
-  }
-
-  _handleModeChange() {
-    this._eventNewPresenter.destroy();
-    Object.values(this._eventsPresenters).forEach((presenter) => presenter.resetView());
-  }
-
-  _handleViewAction(actionType, updateType, update) {
-    switch (actionType) {
-      case UserAction.UPDATE_EVENT:
-        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.SAVING);
-        this._api.updateEvent(update)
-          .then((response) => {
-            this._eventsModel.updateEvent(updateType, response);
-          })
-          .catch(() => {
-            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
-          });
-        break;
-      case UserAction.ADD_EVENT:
-        this._eventNewPresenter.setSaving();
-        this._api.addEvent(update)
-          .then((response) => {
-            this._eventsModel.addEvent(updateType, response);
-          })
-          .catch(() => {
-            this._eventNewPresenter.setAborting();
-          });
-        break;
-      case UserAction.DELETE_EVENT:
-        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.DELETING);
-        this._api.deleteEvent(update)
-          .then(() => {
-            this._eventsModel.deleteEvent(updateType, update);
-          })
-          .catch(() => {
-            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
-          });
-        break;
-    }
-  }
-
-  _handleModelEvent(updateType, data) {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        this._eventsPresenters[data.id].init(data);
-        break;
-      case UpdateType.MINOR:
-        this._clearEventsList();
-        this._eventsCount = this._getEvents().length;
-        this._renderEventsList();
-        break;
-      case UpdateType.MAJOR:
-        this._clearEventsList({resetSortType: true});
-        this._eventsCount = this._getEvents().length;
-        this._renderEventsList();
-        break;
-      case UpdateType.INIT:
-        this._isLoading = false;
-        remove(this._loadingComponent);
-        showListStyleLine();
-        this._clearEventsList();
-        this._eventsCount = this._getEvents().length;
-        this._renderEventsList();
-        break;
-    }
-  }
-
   _renderTripInfo() {
     if (this._tripInfoComponent !== null) {
       remove(this._tripInfoComponent);
@@ -257,6 +181,82 @@ export default class EventsList {
       this._renderSort();
       this._renderList();
       this._renderEvents();
+    }
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._clearEventsList();
+    this._renderEventsList();
+  }
+
+  _handleModeChange() {
+    this._eventNewPresenter.destroy();
+    Object.values(this._eventsPresenters).forEach((presenter) => presenter.resetView());
+  }
+
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.SAVING);
+        this._api.updateEvent(update)
+          .then((response) => {
+            this._eventsModel.updateEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
+        break;
+      case UserAction.ADD_EVENT:
+        this._eventNewPresenter.setSaving();
+        this._api.addEvent(update)
+          .then((response) => {
+            this._eventsModel.addEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventNewPresenter.setAborting();
+          });
+        break;
+      case UserAction.DELETE_EVENT:
+        this._eventsPresenters[update.id].setViewState(EventPresenterViewState.DELETING);
+        this._api.deleteEvent(update)
+          .then(() => {
+            this._eventsModel.deleteEvent(updateType, update);
+          })
+          .catch(() => {
+            this._eventsPresenters[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._eventsPresenters[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearEventsList();
+        this._eventsCount = this._getEvents().length;
+        this._renderEventsList();
+        break;
+      case UpdateType.MAJOR:
+        this._clearEventsList({resetSortType: true});
+        this._eventsCount = this._getEvents().length;
+        this._renderEventsList();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        showListStyleLine();
+        this._clearEventsList();
+        this._eventsCount = this._getEvents().length;
+        this._renderEventsList();
+        break;
     }
   }
 }
