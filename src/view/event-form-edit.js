@@ -261,7 +261,7 @@ export default class EventFormEdit extends SmartView {
         defaultDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
         maxDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         onClose: this._startDateChangeHandler,
       },
     );
@@ -280,7 +280,7 @@ export default class EventFormEdit extends SmartView {
         defaultDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
         minDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         onClose: this._endDateChangeHandler,
       },
     );
