@@ -1,5 +1,9 @@
 import {formatDate, getDuration} from '../utils/event.js';
 import AbstractView from './abstract.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 const createOfferTemplate = (offers) => {
   return offers.map((offer) => {
@@ -31,9 +35,9 @@ export const createEventTemplate = (event) => {
               <h3 class="event__title">${type} ${destination.name}</h3>
               <div class="event__schedule">
                 <p class="event__time">
-                  <time class="event__start-time" datetime="${formatDate(startDate, 'YYYY-MM-DDTHH:mm')}">${formatDate(startDate, 'HH:mm')}</time>
+                  <time class="event__start-time" datetime="${dayjs(startDate).utcOffset(+3).format('YYYY-MM-DDTHH:mm')}">${dayjs(startDate).utcOffset(+3).format('HH:mm')}</time>
                   &mdash;
-                  <time class="event__end-time" datetime="${formatDate(endDate, 'YYYY-MM-DDTHH:mm')}">${formatDate(endDate, 'HH:mm')}</time>
+                  <time class="event__end-time" datetime="${dayjs(endDate).utcOffset(+3).format('YYYY-MM-DDTHH:mm')}">${dayjs(endDate).utcOffset(+3).format('HH:mm')}</time>
                 </p>
                 <p class="event__duration">${getDuration(event)}</p>
               </div>

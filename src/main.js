@@ -115,17 +115,17 @@ window.addEventListener('online', () => {
 
   if(apiWithProvider.getIsToSync()) {
     apiWithProvider.sync();
-
-    Promise
-      .all([
-        api.getDestinations(),
-        api.getOffers(),
-      ])
-      .then(([destinations, offers]) => {
-        offersModel.setOffers(offers);
-        destinationsModel.setDestinations(destinations);
-      });
   }
+
+  Promise
+    .all([
+      api.getDestinations(),
+      api.getOffers(),
+    ])
+    .then(([destinations, offers]) => {
+      offersModel.setOffers(offers);
+      destinationsModel.setDestinations(destinations);
+    });
 });
 
 window.addEventListener('offline', () => {

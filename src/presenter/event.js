@@ -45,10 +45,10 @@ export default class Event {
     this._currentDestinationName = this._event.destination.name;
 
     const prevEventComponent = this._eventComponent;
-    const prevEventFormEditCopmponent = this._eventFormEditComponent;
+    const prevEventFormEditComponent = this._eventFormEditComponent;
 
-    this._eventComponent = new EventView(event);
-    this._eventFormEditComponent = new EventFormEditView(event, this._destinationsModel.getDestinationsNames(), this._offersModel.getOffersTypes());
+    this._eventComponent = new EventView(this._event);
+    this._eventFormEditComponent = new EventFormEditView(this._event, this._destinationsModel.getDestinationsNames(), this._offersModel.getOffersTypes());
 
     this._eventComponent.setEditButtonClickHandler(this._handleEventEditButtonClick);
     this._eventComponent.setFavoriteButtonClickHandler(this._handleFavoriteButtonClick);
@@ -59,7 +59,7 @@ export default class Event {
     this._eventFormEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
     this._eventFormEditComponent.setDestinationChangeHandler(this._handleDestinationChange);
 
-    if (prevEventComponent === null || prevEventFormEditCopmponent === null) {
+    if (prevEventComponent === null || prevEventFormEditComponent === null) {
       renderCustomElement(this._eventsListComponent, this._eventComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -69,12 +69,12 @@ export default class Event {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventComponent, prevEventFormEditCopmponent);
+      replace(this._eventComponent, prevEventFormEditComponent);
       this._mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
-    remove(prevEventFormEditCopmponent);
+    remove(prevEventFormEditComponent);
   }
 
   destroy() {
@@ -156,6 +156,8 @@ export default class Event {
   _handleEditFormSubmit(update) {
     if (!isOnline()) {
       toast('You can\'t save task offline');
+      this.setViewState(State.SAVING);
+      this.setViewState(State.ABORTING);
       return;
     }
 
@@ -183,6 +185,8 @@ export default class Event {
   _handleDeleteButtonClick(event) {
     if (!isOnline()) {
       toast('You can\'t delete task offline');
+      this.setViewState(State.DELETING);
+      this.setViewState(State.ABORTING);
       return;
     }
 

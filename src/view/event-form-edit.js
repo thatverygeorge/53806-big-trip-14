@@ -4,6 +4,9 @@ import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
 import {isArrayEmpty, isStringEmpty} from '../utils/common.js';
 
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
+
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_EVENT = {
@@ -127,7 +130,7 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                     id="event-start-time-1"
                     type="text"
                     name="event-start-time"
-                    value="${formatDate(startDate, 'DD/MM/YY HH:mm')}"
+                    value="${formatDate(startDate, 'DD/MM/YY HH')}"
                     ${isDisabled ? 'disabled' : ''}>
                   &mdash;
                   <label class="visually-hidden" for="event-end-time-1">To</label>
@@ -257,12 +260,14 @@ export default class EventFormEdit extends SmartView {
     this._startDatepicker = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
-        dateFormat: 'd/m/y H:i',
-        defaultDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
-        maxDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
+        dateFormat: 'Z',
+        altFormat: 'd/m/y H:i',
+        altInput: true,
+        defaultDate: formatDate(this._data.startDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+        maxDate: formatDate(this._data.endDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
         enableTime: true,
         'time_24hr': true,
-        onClose: this._startDateChangeHandler,
+        onChange: this._startDateChangeHandler,
       },
     );
   }
@@ -277,17 +282,24 @@ export default class EventFormEdit extends SmartView {
       this.getElement().querySelector('#event-end-time-1'),
       {
         dateFormat: 'd/m/y H:i',
-        defaultDate: formatDate(this._data.endDate, 'DD/MM/YY HH:mm'),
-        minDate: formatDate(this._data.startDate, 'DD/MM/YY HH:mm'),
+        defaultDate: this._data.endDate,
+        minDate: this._data.startDate,
         enableTime: true,
         'time_24hr': true,
-        onClose: this._endDateChangeHandler,
+        onChange: this._endDateChangeHandler,
       },
     );
   }
 
   _setPriceChangeHandler() {
-    this.getElement().querySelector('.event__input--price').addEventListener('change', this._priceChangeHandler);
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    const prevValue = priceInputElement.value;
+
+    priceInputElement.focus();
+    priceInputElement.value = '';
+    priceInputElement.value = prevValue;
+
+    priceInputElement.addEventListener('input', this._priceChangeHandler);
   }
 
   _setOfferToggleHandler() {
@@ -387,7 +399,7 @@ export default class EventFormEdit extends SmartView {
 
   setDestinationChangeHandler(callback) {
     this._callback.destinationChange = callback;
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationChangeHandler);
   }
 
   static parseEventToState(event) {

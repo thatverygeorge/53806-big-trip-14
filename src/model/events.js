@@ -1,5 +1,9 @@
 import Observer from '../utils/observer.js';
 import {formatDate} from '../utils/event.js';
+import dayjs from 'dayjs';
+
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 export default class Events extends Observer {
   constructor() {
