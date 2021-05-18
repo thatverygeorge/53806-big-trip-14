@@ -4,9 +4,6 @@ import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
 import {isArrayEmpty, isStringEmpty} from '../utils/common.js';
 
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
-
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_EVENT = {
@@ -130,7 +127,7 @@ export const createEventFormEditTemplate = (data, destinationsNames, offersTypes
                     id="event-start-time-1"
                     type="text"
                     name="event-start-time"
-                    value="${formatDate(startDate, 'DD/MM/YY HH')}"
+                    value="${formatDate(startDate, 'DD/MM/YY HH:mm')}"
                     ${isDisabled ? 'disabled' : ''}>
                   &mdash;
                   <label class="visually-hidden" for="event-end-time-1">To</label>
@@ -281,9 +278,11 @@ export default class EventFormEdit extends SmartView {
     this._endDatepicker = flatpickr(
       this.getElement().querySelector('#event-end-time-1'),
       {
-        dateFormat: 'd/m/y H:i',
-        defaultDate: this._data.endDate,
-        minDate: this._data.startDate,
+        dateFormat: 'Z',
+        altFormat: 'd/m/y H:i',
+        altInput: true,
+        defaultDate: formatDate(this._data.endDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+        minDate: formatDate(this._data.startDate, 'YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
         enableTime: true,
         'time_24hr': true,
         onChange: this._endDateChangeHandler,
