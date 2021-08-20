@@ -27,7 +27,6 @@ export default class Offers extends Observer {
     for (let i = 0; i < offers.offers.length; i++) {
       adaptedOffers.push(Object.assign(
         {},
-
         offers.offers[i],
         {
           isChecked: offers.offers[i].isChecked,
